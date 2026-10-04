@@ -1,0 +1,9 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+.ipynb_checkpoints/
+model/*.joblib
+model/*.pkl
+model/evaluation_metrics.json

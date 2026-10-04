@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LiverAI | Stage Classification</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main class="page">
+  <header class="hero">
+    <p class="eyebrow">MACHINE LEARNING · EDUCATIONAL PROJECT</p>
+    <h1>LiverAI</h1>
+    <p class="subtitle">Machine Learning-Based Liver Cirrhosis Stage Prediction</p>
+    <p class="intro">Enter clinical variables to receive a model-generated class estimate.</p>
+    {% if model_ready %}<span class="status ready">Model loaded</span>
+    {% else %}<span class="status pending">Model not trained yet — run train_model.py</span>{% endif %}
+  </header>
+  {% if error %}<div class="alert">{{ error }}</div>{% endif %}
+  <form method="post" class="panel">
+    <h2>Clinical inputs</h2>
+    <div class="fields">
+      <label>Age (years)<input type="number" step="any" min="1" max="120" name="Age" required value="{{ form_values.get('Age','') }}"></label>
+      <label>Follow-up days (N_Days)<input type="number" step="any" min="0" name="N_Days" required value="{{ form_values.get('N_Days','') }}"></label>
+      {% for field, label, values in [
+        ('Sex','Sex',['F','M']),
+        ('Drug','Drug',['Placebo','D-penicillamine']),
+        ('Ascites','Ascites',['N','Y']),
+        ('Hepatomegaly','Hepatomegaly',['N','Y']),
+        ('Spiders','Spiders',['N','Y']),
+        ('Edema','Edema',['N','S','Y'])
+      ] %}
+      <label>{{ label }}<select name="{{ field }}" required><option value="">Select</option>{% for v in values %}<option value="{{v}}" {% if form_values.get(field)==v %}selected{% endif %}>{{v}}</option>{% endfor %}</select></label>
+      {% endfor %}
+      {% for field, label in [
+        ('Bilirubin','Bilirubin (mg/dL)'), ('Cholesterol','Cholesterol'),
+        ('Albumin','Albumin (g/dL)'), ('Copper','Copper'),
+        ('Alk_Phos','Alkaline phosphatase'), ('SGOT','SGOT'),
+        ('Tryglicerides','Triglycerides'), ('Platelets','Platelets'),
+        ('Prothrombin','Prothrombin time')
+      ] %}
+      <label>{{ label }}<input type="number" step="any" min="0" name="{{field}}" required value="{{ form_values.get(field,'') }}"></label>
+      {% endfor %}
+    </div>
+    <button type="submit">Predict stage</button>
+    <p class="hint">The model estimates Stage 1, 2, or 3 based on the labels in the supplied dataset.</p>
+  </form>
+  {% if result %}
+  <section class="result panel">
+    <p class="eyebrow">MODEL OUTPUT</p>
+    <h2>Predicted class: Stage {{ result.stage }}</h2>
+    {% if result.confidence is not none %}<p>Highest model probability: <strong>{{ result.confidence }}%</strong></p>{% endif %}
+    {% if result.probabilities %}
+    <h3>Class probabilities</h3>
+    {% for stage, prob in result.probabilities.items() %}
+    <div class="prob-row"><span>{{ stage }}</span><div class="bar"><span style="width: {{ prob }}%"></span></div><strong>{{ prob }}%</strong></div>
+    {% endfor %}
+    {% endif %}
+  </section>
+  {% endif %}
+  <footer>Educational use only. Not clinically validated and not intended for diagnosis or treatment decisions.</footer>
+</main>
+</body>
+</html>
