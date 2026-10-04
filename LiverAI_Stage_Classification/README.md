@@ -148,7 +148,7 @@ Use synthetic or appropriately de-identified sample records for demonstrations. 
 
 ## Author
 
-**Your Name**
+**Sowmya**
 B.Tech – Computer Science and Engineering
 GitHub: `https://github.com/SowmyaChavva`
 
